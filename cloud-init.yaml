@@ -1,0 +1,37 @@
+#cloud-config
+packages:
+  - curl
+users:
+  - name: cluster
+    ssh-authorized-keys:
+      - ${master_public_key}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+  - name: root
+    ssh-authorized-keys:
+      - ${master_public_key}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+write_files:
+  - path: /root/init-server.sh
+    content: |
+      ${indent(6, init_server)}
+    permissions: "0700"
+  - path: /root/docker-compose.yml
+    content: |
+      ${indent(6, compose_yaml)}
+    permissions: "0600"
+  - path: /root/run-compose.sh
+    content: |
+      ${indent(6, run_compose)}
+    permissions: "0700"
+
+#runcmd:
+#  - udevadm trigger -c add -s block -p ID_VENDOR=HC --verbose -p ID_MODEL=Volume
+#  - find /mnt -maxdepth 1 -type d -name 'HC_Volume_*' | awk 'NR==1' > /tmp/mountname
+#  - /root/init-server.sh
+#  - [ mkdir, -m, 0700, -p, `cat /tmp/mountname`/mysql ]
+#  - [ mkdir, -m, 0700, -p, `cat /tmp/mountname`/piwigo/config ]
+#  - [ mkdir, -m, 0700, -p, `cat /tmp/mountname`/piwigo/gallery ]
+
+#  - /root/run-compose.sh  

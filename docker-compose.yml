@@ -1,0 +1,40 @@
+version: '3.1'
+services:
+  db:
+    image: mysql:8.0.32
+    volumes: 
+      - /mnt/ext_volume/mysql:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${mysql_passwd}
+      MYSQL_DATABASE: piwigo
+    # (this is just an example, not intended to be a production configuration)
+  piwigo:
+    image: lscr.io/linuxserver/piwigo:13.5.0
+    container_name: piwigo
+    depends_on:
+      - db
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /mnt/ext_volume/piwigo/config:/config
+      - /mnt/ext_volume/piwigo/gallery:/gallery
+    ports:
+      - 8088:80
+    restart: unless-stopped
+  proxy:
+    image: "nginx:latest"
+    container_name: proxy
+    restart: always
+    depends_on:
+      - db
+      - piwigo
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/data/proxy/letsencrypt:/etc/letsencrypt"    
+      - "/data/proxy/webroot:/usr/share/nginx/html"
+      - "/data/proxy/conf.d/app.conf:/etc/nginx/conf.d/app.conf"
