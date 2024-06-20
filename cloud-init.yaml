@@ -25,6 +25,10 @@ write_files:
     content: |
       ${indent(6, run_compose)}
     permissions: "0700"
+  - path: /root/run-reboot.sh
+    content: |
+      ${indent(6, run_reboot)}
+    permissions: "0700"
 
 #runcmd:
 #  - udevadm trigger -c add -s block -p ID_VENDOR=HC --verbose -p ID_MODEL=Volume

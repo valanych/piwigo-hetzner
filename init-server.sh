@@ -52,16 +52,6 @@ echo "2.2"
 
 echo "3" >> ~/whoami
 
-#sed \
-#  -e 's/\/\/Unattended-Upgrade::Automatic-Reboot/Unattended-Upgrade::Automatic-Reboot/' \
-#  -e 's/\/\/Unattended-Upgrade::Remove-Unused-Kernel-Packages/Unattended-Upgrade::Remove-Unused-Kernel-Packages/' \
-#  -e 's/\/\/Unattended-Upgrade::Remove-New-Unused-Dependencies/Unattended-Upgrade::Remove-New-Unused-Dependencies/' \
-#  < /etc/apt/apt.conf.d/50unattended-upgrades \
-#  > /tmp/50unattended-upgrades
-#mv /tmp/50unattended-upgrades /etc/apt/apt.conf.d/
- 
-echo "4 before" >> ~/whoami
-
 echo $DOCKER_CONFIG >> ~/whoami
 
 DOCKER_CONFIG=${DOCKER_CONFIG:-~/.docker}
@@ -78,5 +68,3 @@ curl -SL https://github.com/docker/compose/releases/download/v2.6.1/docker-compo
 
 echo "7" >> ~/whoami
 chmod +x $DOCKER_COMPOSE
-
-#reboot

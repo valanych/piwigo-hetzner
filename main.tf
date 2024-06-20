@@ -41,8 +41,12 @@ provider "hcloud" {
   token = var.hcloud_token
 }
 
+resource "random_id" "server_suffix" {
+  byte_length = 2
+}
+
 resource "hcloud_server" "master-node" {
-  name        = "master-node"
+  name        = "master-node-${random_id.server_suffix.hex}"
   image       = "ubuntu-22.04"
   server_type = "cax11"
   location    = "fsn1"
@@ -59,7 +63,8 @@ resource "hcloud_server" "master-node" {
     run_compose = templatefile("${path.module}/run-compose.sh", {
       DOCKERHUB_PASSWORD = var.DOCKERHUB_PASSWORD,
       DOCKERHUB_USERNAME = var.DOCKERHUB_USERNAME
-    })
+    }),
+    run_reboot = file("${path.module}/run-reboot.sh")
   })
 
   # If we don't specify this, Terraform will create the resources in parallel
@@ -67,8 +72,8 @@ resource "hcloud_server" "master-node" {
   #depends_on = [hcloud_network_subnet.private_network_subnet]
 }
 
-resource "hcloud_volume" "master" {
-  name      = "ext-volume"
+resource "hcloud_volume" "master-volume" {
+  name      = "master-volume-${random_id.server_suffix.hex}"
   size      = 10  
   server_id = hcloud_server.master-node.id
   automount = true
@@ -90,10 +95,29 @@ resource "hcloud_volume" "master" {
       "sudo mkdir -p $(readlink -f /mnt/ext_volume)/piwigo/config",
       "sudo mkdir -p $(readlink -f /mnt/ext_volume)/piwigo/gallery",
       "sudo mkdir -p $(readlink -f /mnt/ext_volume)/mysql",
-      "sudo /root/init-server.sh",
-      "sudo /root/run-compose.sh -f /root/docker-compose.yml up -d"
     ]
   }
+}
+
+resource "null_resource" "run_scripts" {
+  connection {
+    type     = "ssh"
+    user     = "cluster"
+    private_key = file("${path.module}/.mysecrets/id_rsa.hetzner")
+    host     = hcloud_server.master-node.ipv4_address
+    script_path = "/home/cluster/remote-exec.sh"
+    agent = false
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo /root/init-server.sh",
+      "sudo /root/run-compose.sh -f /root/docker-compose.yml up -d",
+      "sudo /root/run-reboot.sh"
+    ]
+  }
+
+  depends_on = [hcloud_server.master-node, hcloud_volume.master-volume]
 }
 
 #resource "hcloud_volume_attachment" "testvolume_attachment" {
