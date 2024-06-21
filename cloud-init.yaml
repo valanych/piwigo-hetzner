@@ -2,7 +2,7 @@
 packages:
   - curl
 users:
-  - name: cluster
+  - name: piwigo
     ssh-authorized-keys:
       - ${master_public_key}
     sudo: ALL=(ALL) NOPASSWD:ALL
@@ -29,13 +29,3 @@ write_files:
     content: |
       ${indent(6, run_reboot)}
     permissions: "0700"
-
-#runcmd:
-#  - udevadm trigger -c add -s block -p ID_VENDOR=HC --verbose -p ID_MODEL=Volume
-#  - find /mnt -maxdepth 1 -type d -name 'HC_Volume_*' | awk 'NR==1' > /tmp/mountname
-#  - /root/init-server.sh
-#  - [ mkdir, -m, 0700, -p, `cat /tmp/mountname`/mysql ]
-#  - [ mkdir, -m, 0700, -p, `cat /tmp/mountname`/piwigo/config ]
-#  - [ mkdir, -m, 0700, -p, `cat /tmp/mountname`/piwigo/gallery ]
-
-#  - /root/run-compose.sh  

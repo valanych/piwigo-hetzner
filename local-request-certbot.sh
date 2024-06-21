@@ -5,7 +5,7 @@ if [ -z "$SERVER" ] || [ -z "$EMAIL" ]; then
   exit 1
 fi
 
-ssh -T -i .mysecrets/id_rsa.hetzner cluster@${SERVER} <<EOF
+ssh -T -i .mysecrets/id_rsa.hetzner piwigo@${SERVER} <<EOF
 
 sudo -i
 

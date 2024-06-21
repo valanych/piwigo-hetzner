@@ -3,7 +3,6 @@ terraform {
   required_providers {
     hcloud = {
       source  = "hetznercloud/hcloud"
-      # Here we use version 1.45.0, this may change in the future
       version = "1.47.0"
     }
   }
@@ -48,7 +47,7 @@ resource "random_id" "server_suffix" {
 resource "hcloud_server" "master-node" {
   name        = "master-node-${random_id.server_suffix.hex}"
   image       = "ubuntu-22.04"
-  server_type = "cax11"
+  server_type = "cx22"
   location    = "fsn1"
   public_net {
     ipv4_enabled = true
@@ -82,10 +81,10 @@ resource "hcloud_volume" "master-volume" {
 
   connection {
     type     = "ssh"
-    user     = "cluster"
+    user     = "piwigo"
     private_key = file("${path.module}/.mysecrets/id_rsa.hetzner")
     host     = hcloud_server.master-node.ipv4_address
-    script_path = "/home/cluster/remote-exec.sh"
+    script_path = "/home/piwigo/remote-exec.sh"
     agent = false
   }
 
@@ -102,18 +101,18 @@ resource "hcloud_volume" "master-volume" {
 resource "null_resource" "run_scripts" {
   connection {
     type     = "ssh"
-    user     = "cluster"
+    user     = "piwigo"
     private_key = file("${path.module}/.mysecrets/id_rsa.hetzner")
     host     = hcloud_server.master-node.ipv4_address
-    script_path = "/home/cluster/remote-exec.sh"
+    script_path = "/home/piwigo/remote-exec.sh"
     agent = false
   }
 
   provisioner "remote-exec" {
     inline = [
-      "sudo /root/init-server.sh",
-      "sudo /root/run-compose.sh -f /root/docker-compose.yml up -d",
-      "sudo /root/run-reboot.sh"
+      "sudo /root/init-server.sh | tee ~/init-server.log",
+      "sudo /root/run-compose.sh -f /root/docker-compose.yml up -d --wait | tee ~/run-compose.log",
+      "sudo /root/run-reboot.sh | tee ~/run-reboot.log"
     ]
   }
 

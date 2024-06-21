@@ -10,7 +10,7 @@ services:
       MYSQL_DATABASE: piwigo
     # (this is just an example, not intended to be a production configuration)
   piwigo:
-    image: lscr.io/linuxserver/piwigo:13.5.0
+    image: lscr.io/linuxserver/piwigo:latest
     container_name: piwigo
     depends_on:
       - db

@@ -14,57 +14,37 @@ apt_wait () {
   fi
 }
 
-whoami > ~/whoami
-
 apt-get update
 apt_wait
 apt-get install -y \
   software-properties-common \
   add-apt-key \
-  sshguard
-
-echo "0" >> ~/whoami
+  sshguard \
+  mc
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 
-echo "1" >> ~/whoami
-
 add-apt-repository -y \
-  "deb [arch=arm64] https://download.docker.com/linux/ubuntu \
+  "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) \
   stable"
 
-echo "2"
-
 apt_wait
-
-echo "2.0"
 
 apt-get update -y
 apt_wait
-echo "2.1"
 apt-get install -y docker-ce docker-ce-cli containerd.io 2>&1 >> ~/whoami
-echo "2.2"
-#sudo NEEDRESTART_MODE=a apt-get upgrade -y
-
+sudo NEEDRESTART_MODE=a apt-get upgrade -y
+apt_wait
 # enable automatic reboots and package pruning 
 # to keep disk usage in check
 
-echo "3" >> ~/whoami
-
-echo $DOCKER_CONFIG >> ~/whoami
-
 DOCKER_CONFIG=${DOCKER_CONFIG:-~/.docker}
-
-echo "5 after"
-echo $HOME >> ~/whoami
-echo $DOCKER_CONFIG >> ~/whoami
 
 mkdir -p $DOCKER_CONFIG/cli-plugins 2>&1 >> ~/whoami
 
 DOCKER_COMPOSE=$DOCKER_CONFIG/cli-plugins/docker-compose
-echo "6" >> ~/whoami
-curl -SL https://github.com/docker/compose/releases/download/v2.6.1/docker-compose-linux-aarch64 -o $DOCKER_COMPOSE
+#curl -SL https://github.com/docker/compose/releases/download/v2.6.1/docker-compose-linux-aarch64 -o $DOCKER_COMPOSE
+curl -SL https://github.com/docker/compose/releases/download/v2.27.2/docker-compose-linux-x86_64 -o $DOCKER_COMPOSE
 
-echo "7" >> ~/whoami
 chmod +x $DOCKER_COMPOSE
