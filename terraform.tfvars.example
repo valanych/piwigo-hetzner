@@ -1,0 +1,6 @@
+hcloud_token = "xoO4OsdsdHskyCMuksX8LcIjmJji3ahW1LVBwVMpZnGSwCXDjos74eH7BEKA68Hofc"
+master_public_key = ".mysecrets/id_rsa.hetzner.pub"
+DOCKERHUB_USERNAME = "dockerhub_user"
+DOCKERHUB_PASSWORD = "dockerhub_password"
+server_type = "cx22"
+server_location = "fsn1"

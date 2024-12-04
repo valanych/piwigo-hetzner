@@ -10,28 +10,24 @@ terraform {
 
 # Declare the hcloud_token variable from .tfvars
 variable "hcloud_token" {
-  sensitive = true # Requires terraform >= 0.14
+  sensitive = true
 }
-variable "hello" {
-  sensitive = true # Requires terraform >= 0.14
+variable "server_type" {
+  type = string
 }
-
+variable "server_location" {
+  type = string
+}
 variable "master_public_key" {
-  sensitive = true
-}
-variable "master_private_key" {
-  sensitive = true
-}
-variable "worker_public_key" {
-  sensitive = true
-}
-variable "worker_private_key" {
   sensitive = true
 }
 variable "DOCKERHUB_USERNAME" {
   sensitive = true
 }
 variable "DOCKERHUB_PASSWORD" {
+  sensitive = true
+}
+variable "mysql_password" {
   sensitive = true
 }
 
@@ -47,17 +43,17 @@ resource "random_id" "server_suffix" {
 resource "hcloud_server" "master-node" {
   name        = "master-node-${random_id.server_suffix.hex}"
   image       = "ubuntu-22.04"
-  server_type = "cx22"
-  location    = "fsn1"
+  server_type = var.server_type
+  location    = var.server_location
   public_net {
     ipv4_enabled = true
     ipv6_enabled = true
   }
   user_data = templatefile("${path.module}/cloud-init.yaml", {
-    master_public_key = file("${path.module}/.mysecrets/id_rsa.hetzner.pub"),
+    master_public_key = file("${path.module}/${var.master_public_key}"),
     init_server = file("${path.module}/init-server.sh"),
     compose_yaml = templatefile("${path.module}/docker-compose.yml", {
-      mysql_passwd = "example"
+      mysql_passwd = var.mysql_password
     }),
     run_compose = templatefile("${path.module}/run-compose.sh", {
       DOCKERHUB_PASSWORD = var.DOCKERHUB_PASSWORD,
