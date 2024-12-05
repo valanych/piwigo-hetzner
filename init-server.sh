@@ -24,9 +24,8 @@ apt-get install -y \
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 
-ARCH=`uname -m`
 add-apt-repository -y \
-  "deb [arch=${ARCH}] https://download.docker.com/linux/ubuntu \
+  "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) \
   stable"
 
@@ -45,8 +44,7 @@ DOCKER_CONFIG=${DOCKER_CONFIG:-~/.docker}
 mkdir -p $DOCKER_CONFIG/cli-plugins
 
 DOCKER_COMPOSE=$DOCKER_CONFIG/cli-plugins/docker-compose
-#curl -SL https://github.com/docker/compose/releases/download/v2.6.1/docker-compose-linux-aarch64 -o $DOCKER_COMPOSE
-#curl -SL https://github.com/docker/compose/releases/download/v2.27.2/docker-compose-linux-x86_64 -o $DOCKER_COMPOSE
-curl -SL https://github.com/docker/compose/releases/download/v2.27.2/docker-compose-linux-${ARCH} -o $DOCKER_COMPOSE
+ARCH=`uname -m`
+curl -SL https://github.com/docker/compose/releases/download/v2.31.0/docker-compose-linux-${ARCH} -o $DOCKER_COMPOSE
 
 chmod +x $DOCKER_COMPOSE

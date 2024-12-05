@@ -5,7 +5,9 @@ if [ -z "$SERVER" ] || [ -z "$EMAIL" ]; then
   exit 1
 fi
 
-ssh -T -i .mysecrets/id_rsa.hetzner piwigo@${SERVER} <<EOF
+master_private_key=$(grep '^master_private_key' terraform.tfvars | awk -F '=' '{gsub(/[ "]/, "", $2); print $2}')
+
+ssh -T -i ${master_private_key} piwigo@${SERVER} <<EOF
 
 sudo -i
 

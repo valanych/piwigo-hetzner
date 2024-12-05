@@ -10,7 +10,7 @@ All steps must be executed in the folder where you checked out the sources.
 * Generate a key pair and put the public key in the `.mysecrets` working folder.
 `mkdir .mysecrets | ssh-keygen -f ./.mysecrets/id_rsa_piwigo`
 * Copy `terraform.tfvars.example` to `terraform.tfvars` and replace the values accordingly:
-API token, master public key filename, Docker Hub credentials, server [instance type](https://www.hetzner.com/cloud/) and location, the password of the `root` user (choose whatever password you like) that MySQL will use to create the database. 
+API token, master public key filename, Docker Hub credentials, server [instance type](https://www.hetzner.com/cloud/) (for example, "cax11" for ARM or CX22 for Intel CPU) and location, the password of the `root` user (choose whatever password you like) that MySQL will use to create the database. 
 * Run `terraform init`
 * Run `terraform apply`, it takes a couple of minutes to install
 * Go to the Hetzner Cloud console and find the server's public IP (*SERVER_IP*).
