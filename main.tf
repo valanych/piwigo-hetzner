@@ -18,6 +18,9 @@ variable "server_type" {
 variable "server_location" {
   type = string
 }
+variable "master_private_key" {
+  sensitive = true
+}
 variable "master_public_key" {
   sensitive = true
 }
@@ -78,7 +81,7 @@ resource "hcloud_volume" "master-volume" {
   connection {
     type     = "ssh"
     user     = "piwigo"
-    private_key = file("${path.module}/.mysecrets/id_rsa.hetzner")
+    private_key = file("${path.module}/${var.master_private_key}")
     host     = hcloud_server.master-node.ipv4_address
     script_path = "/home/piwigo/remote-exec.sh"
     agent = false
@@ -98,7 +101,7 @@ resource "null_resource" "run_scripts" {
   connection {
     type     = "ssh"
     user     = "piwigo"
-    private_key = file("${path.module}/.mysecrets/id_rsa.hetzner")
+    private_key = file("${path.module}/${var.master_private_key}")
     host     = hcloud_server.master-node.ipv4_address
     script_path = "/home/piwigo/remote-exec.sh"
     agent = false
@@ -106,9 +109,9 @@ resource "null_resource" "run_scripts" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo /root/init-server.sh | tee ~/init-server.log",
-      "sudo /root/run-compose.sh -f /root/docker-compose.yml up -d --wait | tee ~/run-compose.log",
-      "sudo /root/run-reboot.sh | tee ~/run-reboot.log"
+      "sudo /root/init-server.sh 2>&1 | tee ~/init-server.log",
+      "sudo /root/run-compose.sh -f /root/docker-compose.yml up -d --wait 2>&1 | tee ~/run-compose.log",
+      "sudo /root/run-reboot.sh 2>&1 | tee ~/run-reboot.log"
     ]
   }
 

@@ -24,8 +24,9 @@ apt-get install -y \
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 
+ARCH=`uname -m`
 add-apt-repository -y \
-  "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+  "deb [arch=${ARCH}] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) \
   stable"
 
@@ -33,7 +34,7 @@ apt_wait
 
 apt-get update -y
 apt_wait
-apt-get install -y docker-ce docker-ce-cli containerd.io 2>&1 >> ~/whoami
+apt-get install -y docker-ce docker-ce-cli containerd.io
 sudo NEEDRESTART_MODE=a apt-get upgrade -y
 apt_wait
 # enable automatic reboots and package pruning 
@@ -41,10 +42,11 @@ apt_wait
 
 DOCKER_CONFIG=${DOCKER_CONFIG:-~/.docker}
 
-mkdir -p $DOCKER_CONFIG/cli-plugins 2>&1 >> ~/whoami
+mkdir -p $DOCKER_CONFIG/cli-plugins
 
 DOCKER_COMPOSE=$DOCKER_CONFIG/cli-plugins/docker-compose
 #curl -SL https://github.com/docker/compose/releases/download/v2.6.1/docker-compose-linux-aarch64 -o $DOCKER_COMPOSE
-curl -SL https://github.com/docker/compose/releases/download/v2.27.2/docker-compose-linux-x86_64 -o $DOCKER_COMPOSE
+#curl -SL https://github.com/docker/compose/releases/download/v2.27.2/docker-compose-linux-x86_64 -o $DOCKER_COMPOSE
+curl -SL https://github.com/docker/compose/releases/download/v2.27.2/docker-compose-linux-${ARCH} -o $DOCKER_COMPOSE
 
 chmod +x $DOCKER_COMPOSE
